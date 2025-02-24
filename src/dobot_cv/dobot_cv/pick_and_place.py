@@ -65,22 +65,21 @@ class PickAndPlace(Node):
             self.msg_buffer.pop(0)
 
     def semaphore_callback(self, msg):
-    """Callback for semaphore topic."""
-    if msg.data.lower() == "green":
-        self.get_logger().info("Green light detected! Starting pick-and-place...")
-        
-        if self.goal_num > 0:
-            self.goal_num = 0
-        self.green_light_detected = True
+        if msg.data.lower() == "green":
+            self.get_logger().info("Green light detected! Starting pick-and-place...")
+            
+            if self.goal_num > 0:
+                self.goal_num = 0
+            self.green_light_detected = True
 
-        self.process_tag_detections()
-        self.execute()
+            self.process_tag_detections()
+            self.execute()
 
-        # Reset green_light_detected so it can trigger again
-        self.green_light_detected = False
+            # Reset green_light_detected so it can trigger again
+            self.green_light_detected = False
 
-    elif msg.data.lower() == "red":
-        self.get_logger().info("Red light detected. Waiting for green light...")
+        elif msg.data.lower() == "red":
+            self.get_logger().info("Red light detected. Waiting for green light...")
 
 
     def process_tag_detections(self):
