@@ -3,8 +3,10 @@
 
 ### Requirements
 
-This control system requires a system setup with ROS 2. It is recommended to use Ubuntu 22.04 with [ROS 2 Humble](https://docs.ros.org/en/humble/index.html).
-
+This control system requires a system setup with ROS 2. It is recommended to use Ubuntu 22.04 with [ROS 2 Humble](https://docs.ros.org/en/humble/index.html). All of the software must be used on a Raspberry Pi connected to a webcam and on the same wifi network of the robotic arm. Also, the user has to know the robotic arm's IP in order to correctly modifiy the IP inside 
+```
+src/dovot_driver/dovot_driver/dobot_handle.py
+```
 ### Install ROS 2 Humble Hawksbill
 Follow the instructions from the [link](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html). There are 3 versions of ROS 2 Humble Hawksbill to choose from: Desktop Install, ROS-Base Install and Development tools Install. Be sure to install **Desktop Install** version (`sudo apt install ros-humble-desktop`).
 
