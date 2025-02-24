@@ -1,4 +1,4 @@
-# autonomous_robotics
+# Autonomous and collaborative robotics: Simulating multi-robot collaboration
 ## Installation :arrow_down:
 
 ### Requirements
@@ -38,4 +38,11 @@ Homing is handled by the service server, to start it run the following command:
 ```
 ros2 service call /dobot_homing_service dobot_msgs/srv/ExecuteHomingProcedure
 ```
+
+## Publish Green Light on Semaphore and Trigger Action Server
+
+The following command is used to publish a "green" signal to the `/semaphore` topic, which allows the action server to start its execution:
+
+```bash
+ros2 topic pub --once /semaphore std_msgs/msg/String "{data: 'green'}"
 
