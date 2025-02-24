@@ -48,7 +48,7 @@ class CameraProcessor(Node):
         
         # Roboflow API key and project details
         rf = roboflow.Roboflow(api_key="ncH2Wguo0cJ3wV8FZ7sv")
-        project = rf.workspace().project("brick2-uslhy")
+        project = rf.workspace().project("brick3")
         self.model = project.version("2").model
         # Set confidence and overlap thresholds (optional)
         self.model.confidence = 50  # Minimum confidence threshold (50%)
