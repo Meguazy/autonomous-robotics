@@ -23,3 +23,19 @@ cd magician_ros2_control_system_ws
 rosdep install -i --from-path src --rosdistro humble -y
 colcon build
 ```
+
+## System startup :robot:
+1. Connect Dobot Magician with a USB cable to the computer and then turn it on. 
+2. Set the MAGICIAN_TOOL environment variable describing the robot's configuration `export MAGICIAN_TOOL=<tool_type>` (allowed values are: _none, pen, suction_cup, gripper, extended_gripper_).
+3. From inside of the **magician_ros2_control_system_ws** directory, run `. install/setup.bash` to source your workspace.
+3. Launch entire control stack with `ros2 launch dobot_bringup dobot_magician_control_system.launch.py`. 
+
+
+<a name="homing"></a>
+## Homing procedure
+Homing should be performed as the first action after the system is started. It is necessary because an incremental encoder has been placed in the base of the manipulator, and the robot is not aware of its actual position when it is powered up. Stop all other scripts controlling the robot before starting the homing procedure.   
+Homing is handled by the service server, to start it run the following command:
+```
+ros2 service call /dobot_homing_service dobot_msgs/srv/ExecuteHomingProcedure
+```
+
