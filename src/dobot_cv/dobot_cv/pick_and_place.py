@@ -76,7 +76,6 @@ class PickAndPlace(Node):
             self.execute()
 
             # Reset green_light_detected so it can trigger again
-            self.green_light_detected = False
 
         elif msg.data.lower() == "red":
             self.get_logger().info("Red light detected. Waiting for green light...")
@@ -87,25 +86,56 @@ class PickAndPlace(Node):
         mean_values = self.calculate_means(self.msg_buffer)
         self.log_means(mean_values)
         
-        mean_x_lego_brick = mean_values.get('lego_brick', {}).get('mean_x', None)
-        mean_y_lego_brick = mean_values.get('lego_brick', {}).get('mean_y', None)
+        mean_x_red_brick = mean_values.get('red-lego', {}).get('mean_x', None)
+        mean_y_red_brick = mean_values.get('red-lego', {}).get('mean_y', None)
+        
+        mean_x_black_brick = mean_values.get('black-lego', {}).get('mean_x', None)
+        mean_y_black_brick = mean_values.get('black-lego', {}).get('mean_y', None)
+        
+        mean_x_white_brick = mean_values.get('white-lego', {}).get('mean_x', None)
+        mean_y_white_brick = mean_values.get('white-lego', {}).get('mean_y', None)
         
         mean_x_tag_3 = mean_values.get('3', {}).get('mean_x', None)
         mean_y_tag_3 = mean_values.get('3', {}).get('mean_y', None)
+        
+        mean_x_tag_2 = mean_values.get('2', {}).get('mean_x', None)
+        mean_y_tag_2 = mean_values.get('2', {}).get('mean_y', None)
 
-        # Tasks for pick-and-place
+        mean_x_tag_1 = mean_values.get('1', {}).get('mean_x', None)
+        mean_y_tag_1 = mean_values.get('1', {}).get('mean_y', None)
+
+
         self.tasks_list = [
-            ["move", [mean_x_lego_brick, mean_y_lego_brick, 100.0, 65.0], 1],
+            ["move", [mean_x_red_brick, mean_y_red_brick, 10.0, 65.0], 1, 1.0, 1.0],  # Move with 50% speed
             ["gripper", "open", False],
-            ["move", [mean_x_lego_brick, mean_y_lego_brick, -28.0, 65.0], 1],
+            ["move", [mean_x_red_brick, mean_y_red_brick, -8.0, 65.0], 1, 0.1, 0.1], # Move faster
             ["gripper", "close", True],
-            ["move", [mean_x_lego_brick, mean_y_lego_brick, 100.0, 65.0], 1],
-            ["move", [mean_x_tag_3, mean_y_tag_3, 100.0, 65.0], 1],
-            ["move", [mean_x_tag_3, mean_y_tag_3, -28.0, 65.0], 1],
+            ["move", [mean_x_red_brick, mean_y_red_brick, 100.0, 65.0], 1, 1.0, 1.0],
+            ["move", [mean_x_tag_1, mean_y_tag_1, 100.0, 65.0], 1, 1.0, 1.0],  # Full speed
+            ["move", [mean_x_tag_1, mean_y_tag_1, -8.0, 65.0], 1, 1.0, 1.0],
             ["gripper", "open", False],
-            ["move", [mean_x_tag_3, mean_y_tag_3, 100.0, 65.0], 1],
+            ["move", [mean_x_tag_1, mean_y_tag_1, 10.0, 65.0], 1, 1.0, 1.0],
+            
+            ["move", [mean_x_black_brick, mean_y_black_brick, 10.0, 65.0], 1, 1.0, 1.0],  # Move with 50% speed
+            ["move", [mean_x_black_brick, mean_y_black_brick, -8.0, 65.0], 1, 0.1, 0.1], # Move faster
+            ["gripper", "close", True],
+            ["move", [mean_x_black_brick, mean_y_black_brick, 100.0, 65.0], 1, 1.0, 1.0],
+            ["move", [mean_x_tag_2, mean_y_tag_2, 100.0, 65.0], 1, 1.0, 1.0],  # Full speed
+            ["move", [mean_x_tag_2, mean_y_tag_2, -8.0, 65.0], 1, 1.0, 1.0],
+            ["gripper", "open", False],
+            ["move", [mean_x_tag_2, mean_y_tag_2, 10.0, 65.0], 1, 1.0, 1.0],
+            
+            ["move", [mean_x_white_brick, mean_y_white_brick, 10.0, 65.0], 1, 1.0, 1.0],  # Move with 50% speed
+            ["move", [mean_x_white_brick, mean_y_white_brick, -8.0, 65.0], 1, 0.1, 0.1], # Move faster
+            ["gripper", "close", True],
+            ["move", [mean_x_white_brick, mean_y_white_brick, 100.0, 65.0], 1, 1.0, 1.0],
+            ["move", [mean_x_tag_3, mean_y_tag_3, 100.0, 65.0], 1, 1.0, 1.0],  # Full speed
+            ["move", [mean_x_tag_3, mean_y_tag_3, -8.0, 65.0], 1, 1.0, 1.0],
+            ["gripper", "open", False],
+            ["move", [mean_x_tag_3, mean_y_tag_3, 10.0, 65.0], 1, 1.0, 1.0],
             ["gripper", "close", False],
-            ["move", [150.0, 0.0, 100.0, 0.0], 1]
+            
+            ["move", [150.0, 0.0, 100.0, 0.0], 1, 1.0, 1.0]  # Move quickly to reset position
         ]
 
     def calculate_means(self, msgs):
@@ -151,23 +181,35 @@ class PickAndPlace(Node):
 
     def execute(self):
         """Execute tasks if green light is detected."""
+        self.get_logger().info(f"Green Light Detected: {self.green_light_detected}")
+
         if not self.green_light_detected:
             self.get_logger().info("Waiting for green light to start execution...")
             return
 
-        if self.goal_num > len(self.tasks_list) - 1:
+        if self.goal_num >= len(self.tasks_list):
+            self.get_logger().info("All tasks completed. Shutting down.")
+            self.green_light_detected = False
             rclpy.shutdown()
             sys.exit()
-        else:
-            self.get_logger().info(f'*** TASK NUM ***: {self.goal_num}')
 
-        if self.tasks_list[self.goal_num][0] == "gripper":
-            self.send_request(*self.tasks_list[self.goal_num][1:])
+        self.get_logger().info(f'*** TASK NUM ***: {self.goal_num}/{len(self.tasks_list)-1}')
+
+        task = self.tasks_list[self.goal_num]
+        self.get_logger().info(f"Executing task: {task}")
+
+        if task[0] == "gripper":
+            self.send_request(*task[1:])
+            self.goal_num += 1
             self.timer = self.create_timer(0.1, self.timer_callback, callback_group=ReentrantCallbackGroup())
+
+        elif task[0] == "move":
+            self.send_goal(*task[1:])
             self.goal_num += 1
-        elif self.tasks_list[self.goal_num][0] == "move":
-            self.send_goal(*self.tasks_list[self.goal_num][1:])
-            self.goal_num += 1
+
+        else:
+            self.get_logger().error(f"Unknown task type: {task[0]}")
+            self.goal_num += 1  # Prevent getting stuck
 
     def timer_callback(self):
         if self.srv_future.done():
@@ -181,14 +223,19 @@ class PickAndPlace(Node):
         self.req.keep_compressor_running = keep_compressor_running
         self.srv_future = self.cli.call_async(self.req)
 
-    def send_goal(self, _target, _type):
+    def send_goal(self, _target, _type, velocity_ratio=1.0, acceleration_ratio=1.0):
         goal_msg = PointToPoint.Goal()
         goal_msg.target_pose = _target
         goal_msg.motion_type = _type
+        goal_msg.velocity_ratio = velocity_ratio
+        goal_msg.acceleration_ratio = acceleration_ratio
+
+        self.get_logger().info(f"Sending goal: {goal_msg}")
 
         self._action_client.wait_for_server()
         self._send_goal_future = self._action_client.send_goal_async(goal_msg, feedback_callback=self.feedback_callback)
         self._send_goal_future.add_done_callback(self.goal_response_callback)
+
 
     def goal_response_callback(self, future):
         goal_handle = future.result()
