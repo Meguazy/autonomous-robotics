@@ -27,7 +27,7 @@ colcon build
 ```
 
 ## System startup :robot:
-1. Connect Dobot Magician with a USB cable to the computer and then turn it on. 
+1. Connect Dobot Magician on the same network of the Raspberry and then turn it on. 
 2. Set the MAGICIAN_TOOL environment variable describing the robot's configuration `export MAGICIAN_TOOL=<tool_type>` (allowed values are: _none, pen, suction_cup, gripper, extended_gripper_).
 3. From inside of the **magician_ros2_control_system_ws** directory, run `. install/setup.bash` to source your workspace.
 3. Launch entire control stack with `ros2 launch dobot_bringup dobot_magician_control_system.launch.py`. 
